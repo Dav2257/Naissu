@@ -1,72 +1,91 @@
 <script setup lang="ts">
-import { reactive, computed, ref } from 'vue';
+import { ref, computed } from 'vue'
 
-const products = [
+type Product = {
+  id: number
+  title: string
+  price: number
+  image: string
+}
+
+type CartItem = Product & { quantity: number }
+
+const products: Product[] = [
   {
     id: 1,
     title: 'Wireless Headphones',
     price: 89.99,
-    image: 'https://images.unsplash.com/photo-1512499617640-c2f999055064?auto=format&fit=crop&w=400&q=80',
+    image:
+      'https://images.unsplash.com/photo-1512499617640-c2f999055064?auto=format&fit=crop&w=400&q=80',
   },
   {
     id: 2,
     title: 'Smart Watch',
     price: 144.99,
-    image: 'https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?auto=format&fit=crop&w=400&q=80',
+    image:
+      'https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?auto=format&fit=crop&w=400&q=80',
   },
   {
     id: 3,
     title: 'Retro Camera',
     price: 219.5,
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
+    image:
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
   },
   {
     id: 4,
     title: 'Gaming Mouse',
     price: 49.99,
-    image: 'https://images.unsplash.com/photo-1580906856274-8a2690b3ee9a?auto=format&fit=crop&w=400&q=80',
+    image:
+      'https://images.unsplash.com/photo-1580906856274-8a2690b3ee9a?auto=format&fit=crop&w=400&q=80',
   },
   {
     id: 5,
     title: 'Bluetooth Speaker',
     price: 79.99,
-    image: 'https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=400&q=80',
+    image:
+      'https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=400&q=80',
   },
-];
+]
 
-const cart = reactive<Record<number, number>>({});
+// Gunakan ref agar TypeScript bisa mengenali typing
+const cart = ref<Record<number, number>>({})
 
 function addToCart(id: number) {
-  if (cart[id]) {
-    cart[id]++;
+  if (cart.value[id]) {
+    cart.value[id]++
   } else {
-    cart[id] = 1;
+    cart.value[id] = 1
   }
 }
 
-const cartItems = computed(() => {
-  return Object.entries(cart).map(([id, qty]) => {
-    const product = products.find((p) => p.id === parseInt(id));
-    return { ...product, quantity: qty };
-  });
-});
+const cartItems = computed<CartItem[]>(() => {
+  return Object.entries(cart.value)
+    .map(([idStr, qty]) => {
+      const id = parseInt(idStr)
+      const product = products.find((p) => p.id === id)
+      if (!product) return null
+      return { ...product, quantity: qty }
+    })
+    .filter((item): item is CartItem => item !== null)
+})
 
 const totalPrice = computed(() =>
-  cartItems.value.reduce((acc, item) => acc + item.price * item.quantity, 0)
-);
+  cartItems.value.reduce((acc, item) => acc + (item.price ?? 0) * item.quantity, 0),
+)
 
-const checkoutMessage = ref('');
-const checkingOut = ref(false);
+const checkoutMessage = ref('')
+const checkingOut = ref(false)
 
 function checkout() {
-  if (cartItems.value.length === 0) return;
-  checkingOut.value = true;
-  checkoutMessage.value = '';
+  if (cartItems.value.length === 0) return
+  checkingOut.value = true
+  checkoutMessage.value = ''
   setTimeout(() => {
-    checkingOut.value = false;
-    checkoutMessage.value = 'Thank you for your purchase! Your order has been processed.';
-    Object.keys(cart).forEach((key) => delete cart[parseInt(key)]);
-  }, 1500);
+    checkingOut.value = false
+    checkoutMessage.value = 'Thank you for your purchase! Your order has been processed.'
+    Object.keys(cart.value).forEach((key) => delete cart.value[parseInt(key)])
+  }, 1500)
 }
 </script>
 
@@ -116,7 +135,7 @@ function checkout() {
 
       <div v-if="cartItems.length > 0" class="mt-6 flex justify-between items-center">
         <span class="text-xl font-bold text-gray-900">Total:</span>
-        <span class="text-xl font-extrabold text-teal-700">$ {{ totalPrice.toFixed(2) }}</span>
+        <span class="text-xl font-extrabold text-teal-700"> $ {{ totalPrice.toFixed(2) }} </span>
       </div>
 
       <button
