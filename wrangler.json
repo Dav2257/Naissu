@@ -1,0 +1,16 @@
+{
+  "name": "naissu",
+  "compatibility_date": "2024-12-30",
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
+  },
+  "main": "./api/index.ts",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "naissu",
+      "database_id": "03ec9018-7a81-4219-bd46-74c569b2b4d4"
+    }
+  ]
+}
