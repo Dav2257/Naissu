@@ -24,7 +24,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const products = ref([
+// Definisikan tipe untuk produk
+interface Product {
+  id: number
+  name: string
+  description: string
+  price: string
+  image: string
+}
+
+// Tetapkan tipe untuk ref
+const products = ref<Product[]>([
   {
     id: 1,
     name: 'Product 1',
@@ -39,6 +49,6 @@ const products = ref([
     price: '$30.00',
     image: 'https://via.placeholder.com/150',
   },
-  // Add more products as needed
+  // Tambahkan lebih banyak produk jika diperlukan
 ])
 </script>
