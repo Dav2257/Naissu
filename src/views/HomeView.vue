@@ -52,6 +52,9 @@ function addToCart(id: number) {
 const cartItems = computed(() => {
   return Object.entries(cart).map(([id, qty]) => {
     const product = products.find((p) => p.id === parseInt(id))
+    if (!product) {
+      throw new Error(`Product with id ${id} not found`)
+    }
     return { ...product, quantity: qty } as {
       id: number
       title: string
@@ -63,7 +66,7 @@ const cartItems = computed(() => {
 })
 
 const totalPrice = computed(() =>
-  cartItems.value.reduce((acc, item) => acc + (item.price || 0) * (item.quantity || 0), 0),
+  cartItems.value.reduce((acc, item) => acc + item.price * item.quantity, 0),
 )
 
 const checkoutMessage = ref('')
@@ -121,9 +124,7 @@ function checkout() {
               <p class="text-gray-500 text-sm">Quantity: {{ item.quantity }}</p>
             </div>
           </div>
-          <p class="font-semibold text-teal-700">
-            $ {{ (item.price || 0) * (item.quantity || 0).toFixed(2) }}
-          </p>
+          <p class="font-semibold text-teal-700">$ {{ (item.price * item.quantity).toFixed(2) }}</p>
         </li>
       </ul>
 
